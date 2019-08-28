@@ -1,0 +1,287 @@
+﻿<!DOCTYPE html>
+@{
+    Layout = null;
+}
+<html lang="en">
+<head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <script src="~/Scripts/knockout-3.5.0.js"></script>
+    <script src="~/Scripts/modernizr-2.8.3.js"></script>
+    <script src="~/Scripts/jquery-3.3.1.js"></script>
+    <style>
+        .navbar {
+            margin-bottom: 0;
+            border-radius: 0;
+        }
+
+        .sidenav {
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid" data-bind="visible: tokenKey">
+            <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav navbar-collapse">
+                    <li><a data-bind="text: Email"></a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a data-bind="click: logout"><span class="glyphicon glyphicon-log-out"></span> LogOut</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+    <br />
+    @*<div id="demo">
+        <button type="button" data-bind="click: loadDoc">enter</button>
+    </div>*@
+    <div data-bind="if: !tokenKey()">
+        <div class="col-lg-4 col-sm-4 col-sm-offset-4 col-lg-offset-4 well">
+            <div class="panel-heading text-center">Увійти</div>
+            <div class="panel-body">
+                <form class="form-horizontal">
+                    <div class="form-group text-center">
+                        <label>Email</label>
+                        <input class="form-control" data-bind="value: Email" />
+                    </div>
+                    <div class="form-group text-center">
+                        <label>Password</label>
+                        <input type="password" class="form-control" data-bind="value: Password" />
+                    </div>
+                    <div class="form-group text-center" data-bind="if: registrStr()">
+                        <label>Confirm password</label>
+                        <input type="password" class="form-control" data-bind="value: ConfirmPassword" />
+                    </div>
+                    <button type="submit" class="btn btn-default" data-bind="visible: !registrStr(), click: login">
+                        Login
+                    </button>
+                    <button type="submit" class="btn btn-default" data-bind="visible: registrStr(), click: registry">
+                        Register
+                    </button>
+                    <button class="btn btn-default" data-bind="click: regFunk">
+                        <div data-bind="visible: !registrStr()">
+                            Registration
+                        </div>
+                        <div data-bind="if: registrStr()">
+                            Back to Login
+                        </div>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+    <div class="text-center sidenav" data-bind="if: tokenKey()">
+        <div class="col-sm-4 well" id="orderlist">
+            <div id="tro" class="section panel">
+                <div class="panel-heading">Мої замовлення</div>
+                <div class="panel-body">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Кількість місць</th>
+                                <th>Категорія</th>
+                                <th>Час прибуття</th>
+                                <th>Час відбуття</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: orderList">
+                            <tr>
+                                <td data-bind="text: Id"></td>
+                                <td data-bind="text: NumberOfBeds"></td>
+                                <td data-bind="text: Category"></td>
+                                <td data-bind="text: ArrivalTime"></td>
+                                <td data-bind="text: DepartureTime"></td>
+                                <td>
+                                    <button type="submit" data-bind="click: deleteord" class="btn btn-default">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 well" id="roomlist">
+            <div id="trk" class="section panel">
+                <div class="panel-heading">Мої кімнати</div>
+                <div class="panel-body">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Кількість місць</th>
+                                <th>Категорія</th>
+                                <th>Час прибуття</th>
+                                <th>Час відбуття</th>
+                                <th>Ціна</th>
+                                @*<th>Статус</th>*@
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach: roomList">
+                            <tr>
+                                <td data-bind="text: Id"></td>
+                                <td data-bind="text: NumberOfBeds"></td>
+                                <td data-bind="text: Category"></td>
+                                <td data-bind="text: ArrivalTime"></td>
+                                <td data-bind="text: DepartureTime"></td>
+                                <td data-bind="text: Cost"></td>
+                                @*<td data-bind="text: Status"></td>*@
+                                <td>
+                                    <button type="submit" data-bind="click: cancel" class="btn btn-default">
+                                        Cancel
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2 well" id="createorder">
+            <div class="panel-heading">Створити замовлення</div>
+            <div class="panel-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label>Кількість місць</label>
+                        <input class="form-control" data-bind="value: newOrder.NumberOfBeds" />
+                    </div>
+                    <div class="form-group">
+                        <label>Категорія</label>
+                        <input class="form-control" data-bind="value: newOrder.Category" />
+                    </div>
+                    <div class="form-group">
+                        <label>Час прибуття</label>
+                        <input type="datetime" data-bind="value: newOrder.ArrivalTime" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Час відбуття</label>
+                        <input type="datetime" data-bind="value: newOrder.DepartureTime" class="form-control" />
+                    </div>
+                    <button type="submit" class="btn btn-default" data-bind="click: createOrd">
+                        Створити
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        var source = "http://localhost:51348";
+        function Start() {
+            roomList = ko.observableArray(JSON.parse(sessionStorage.getItem("r")));
+            orderList = ko.observableArray(JSON.parse(sessionStorage.getItem("o")));
+            newOrder = {
+                NumberOfBeds: ko.observable(3),
+                Category: ko.observable("premier"),
+                ArrivalTime: ko.observable("11.10.2012"),
+                DepartureTime: ko.observable("12.12.2012")
+            };
+            Email = ko.observable("m@gmail.com");//default
+            Password = ko.observable("aS123_");
+            ConfirmPassword = ko.observable("aS123_");
+            tokenKey = ko.observable(sessionStorage.getItem("token"));
+            registrStr = ko.observable(false);
+
+            regFunk = function () { registrStr(!registrStr()); };
+            login = function () { getToken(function () { getrooms(); getorders(); }); }; //визов ajax на реєстрацію і вход, визов даних, приствоєння токена
+            registry = function () { };
+            logout = function () { sessionStorage.clear(); tokenKey(""); }; //визов логаут і приствоєння токену нуля
+
+            deleteord = function (item) {
+                myrequest('DELETE', "api/orders/delete", null, item.Id);
+                setTimeout(function () { getorders(); }, 50);
+            };
+            cancel = function (item) {
+                myrequest('GET', "api/rooms/cancel", null, item.Id);
+                setTimeout(function () { getrooms(); }, 50);
+            };
+            createOrd = function () {
+                var order = {
+                    NumberOfBeds: newOrder.NumberOfBeds(),
+                    Category: newOrder.Category(),
+                    ArrivalTime: newOrder.ArrivalTime(),
+                    DepartureTime: newOrder.DepartureTime()
+                };
+                var res = false;
+                myrequest('POST', "api/orders/create", null, null, order);
+                setTimeout(function () { getorders();},50);
+            };
+
+            myrequest = function (method, controller, callback, add, reqData) {
+                $.ajax({
+                    url: source + "/" + controller + (add ? "/" + add : ""),
+                    type: method,
+                    success: callback,
+                    beforeSend: function (xhr) {
+                        var myToken = sessionStorage.getItem("token");
+                        xhr.setRequestHeader("Authorization", "Bearer " + myToken);
+                    },
+                    contentType: "application/json;charset=utf-8",
+                    dataType: 'json',
+                    data: JSON.stringify(reqData)
+                });
+            };
+
+            getrooms = function () {
+                myrequest('GET', "api/rooms", function (data) {
+                    roomList.removeAll();
+                    for (var i = 0; i < data.length; i++) {
+                        roomList.push(data[i]);
+                    }
+                    sessionStorage.setItem("r", JSON.stringify(roomList()));
+                })
+            };
+            getorders = function () {
+                myrequest('GET', "api/orders", function (data) {
+                    orderList.removeAll();
+                    for (var i = 0; i < data.length; i++) {
+                        orderList.push(data[i]);
+                    }
+                    sessionStorage.setItem("o", JSON.stringify(orderList()));
+
+                })
+            };
+
+            registerData = {
+                username: Email(),
+                password: Password(),
+            };//додати фю для реєстрації
+
+
+            getToken = function (callback) {
+                var loginData = {
+                    grant_type: 'password',
+                    username: Email,
+                    password: Password
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: source + '/Token',
+                    data: loginData,
+                    success: function (data) {
+                        sessionStorage.setItem("token", data.access_token);
+                        tokenKey(data.access_token);
+                        callback();
+                    }
+                });
+            };
+            //loadDoc = function () {
+            //    getrooms();
+            //    getorders();
+            //};
+        }
+        ko.applyBindings(new Start());
+    </script>
+</body>
+</html>
